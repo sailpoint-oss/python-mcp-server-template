@@ -67,6 +67,12 @@ def _build_client(settings: SailPointSettings) -> ApiClient:
             f"Could not reach {settings.base_url} to authenticate: {exc}"
         ) from exc
 
+    # Some ISC APIs the tools need (e.g. access-request-administration) are
+    # flagged experimental, and the SDK refuses to call them unless this is set.
+    # It only unlocks those endpoints; it changes nothing about the ones below.
+    configuration.experimental = True
+    configuration.suppress_experimental_warnings = True
+
     detail = sdk_output.getvalue().strip()
     if not configuration.access_token:
         raise SailPointAuthError(
